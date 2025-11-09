@@ -1,23 +1,62 @@
-//função de mudar imagem pelo id e pela url
+// Função de mudar imagem pelo id e pela url
 function changeImage(id, url) {
   document.getElementById(id).src = url;
 }
-//função de mudar texto pelo id e pelo texto
+
+// Função de mudar texto pelo id e pelo texto
 function changeText(id, text) {
   document.getElementById(id).innerText = text;
 }
 
-// Daqui para baixo voce ira escrever
-// o código para resolver o desafio
+// ----------------------
+// Código do desafio
+// ----------------------
 
+// Variável para guardar o ID do Pokémon atual
+let currentPokemonId = 1;
+
+// Função que busca o Pokémon no backend
+async function fetchPokemon(id) {
+  console.log("Buscando Pokémon ID:", id);
+
+  try {
+    // Faz uma requisição para o backend (Node.js)
+    const response = await fetch(`http://localhost:3000/pokemon/${id}`);
+
+    if (!response.ok) {
+      throw new Error(`Erro ao buscar Pokémon: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("Dados recebidos:", data);
+
+    // Atualiza o nome e a imagem na página
+    changeText("name", data.name);
+    changeImage("img_sprite_front_default", data.image);
+  } catch (error) {
+    console.error("Erro ao buscar Pokémon:", error);
+    changeText("name", "Erro ao carregar Pokémon");
+    changeImage("img_sprite_front_default", "../assets/missingno.png");
+  }
+}
+
+// Função para ir ao Pokémon anterior
 function previousPokemon() {
-  alert("Pokemon Anterior");
-  //abra o terminal em inspecionar no chrome para visualizar
-  console.log("Pokemon Anterior");
+  if (currentPokemonId > 1) {
+    currentPokemonId--;
+    fetchPokemon(currentPokemonId);
+  } else {
+    alert("Esse é o primeiro Pokémon!");
+  }
 }
 
+// Função para ir ao próximo Pokémon
 function nextPokemon() {
-  alert("Pokemon Seguinte");
-  //abra o terminal em inspecionar no chrome para visualizar
-  console.log("Pokemon Seguinte");
+  currentPokemonId++;
+  fetchPokemon(currentPokemonId);
 }
+
+// Ao carregar a página, mostra o primeiro Pokémon
+window.onload = () => {
+  fetchPokemon(currentPokemonId);
+};
